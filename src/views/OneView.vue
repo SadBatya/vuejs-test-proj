@@ -16,6 +16,7 @@
           label="User Text"
         ></v-text-field>
         <v-text-field
+          type="number"
           v-model="post_id"
           hide-details="auto"
           label="User Id"
@@ -35,7 +36,12 @@
           </tr>
         </thead>
         <tbody class="table__inner">
-          <tr class="table__row" v-for="(post, i) in info" :key="i">
+          <tr
+            class="table__row"
+            v-for="(post, i) in info"
+            :key="i"
+            @click.stop="drawer = !drawer"
+          >
             <td class="table__col">{{ post.id }}</td>
             <td class="table__col">{{ post.title }}</td>
             <td class="table__col">{{ post.body }}</td>
@@ -44,7 +50,7 @@
       </template>
     </v-simple-table>
     <v-navigation-drawer v-model="drawer" temporary absolute width="500px">
-      asdasdasdsadsadsad
+      <v-btn color="red" class="nav__delete_btn">Удалить пост</v-btn>
     </v-navigation-drawer>
     <div class="table__buttons">
       <v-btn color="primary" dark @click.stop="drawer = !drawer">
@@ -84,6 +90,10 @@
   justify-content: center;
   margin-top: 50px;
 }
+
+.nav__delete_btn {
+  margin-top: 50px;
+}
 </style>
 
 <script setup>
@@ -99,7 +109,7 @@ import axios from "axios";
 export default {
   data() {
     return {
-      info: [],
+      info: null,
       drawer: null,
       drawer_2: null,
       post_id: "",
@@ -111,9 +121,10 @@ export default {
     async getPosts() {
       try {
         const { data } = await axios.get(
-          "https://dummyjson.com/posts?limit=10"
+          "https://jsonplaceholder.typicode.com/posts"
         );
-        this.info = data.posts;
+        console.log(data);
+        this.info = data;
       } catch (error) {
         console.log("Ошибка запроса", error);
       }
@@ -128,6 +139,9 @@ export default {
       this.post_title = "";
       this.post_body = "";
       alert("Пост успешно добавлен");
+    },
+    deletePost(i) {
+      this.info.filter((post) => post !== post[i]);
     },
   },
   beforeMount() {
