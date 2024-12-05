@@ -60,6 +60,7 @@
         next page
       </v-btn>
     </div>
+    <!-- <PostDescription /> -->
   </div>
 </template>
 
@@ -105,8 +106,12 @@ const drawer_2 = ref(null);
 
 <script>
 import axios from "axios";
+// import PostDescriptionVue from "@/components/PostDescription.vue";
 
 export default {
+  components: {
+    // PostDescriptionVue,
+  },
   data() {
     return {
       info: null,
@@ -121,10 +126,10 @@ export default {
     async getPosts() {
       try {
         const { data } = await axios.get(
-          "https://jsonplaceholder.typicode.com/posts"
+          "https://dummyjson.com/posts?limit=10"
         );
         console.log(data);
-        this.info = data;
+        this.info = data.posts;
       } catch (error) {
         console.log("Ошибка запроса", error);
       }
@@ -143,6 +148,7 @@ export default {
     deletePost(i) {
       this.info.filter((post) => post !== post[i]);
     },
+    // openNavDrawer(id) {},
   },
   beforeMount() {
     this.getPosts();
