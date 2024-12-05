@@ -54,7 +54,7 @@
       <div class="post__description">
         <strong>{{ post_description.title }}</strong>
         <div class="post__description_text">{{ post_description.body }}</div>
-        <v-btn color="red" class="nav__delete_btn" >Удалить пост</v-btn>
+        <v-btn color="red" class="nav__delete_btn" @click="deletePost(post_description.title)">Удалить пост</v-btn>
       </div>
     </v-navigation-drawer>
     <!-- {{ count }} -->
@@ -181,8 +181,11 @@ export default {
       this.post_body = "";
       alert("Пост успешно добавлен");
     },
-    deletePost(i) {
-      this.info.filter((post) => post !== post[i]);
+    deletePost(text) {
+      let filteredList = this.info.filter((post) => post.title !== text);
+      this.info = filteredList
+      console.log(text)
+      console.log('пост удален')
     },
     openNavDrawer(i) {
       this.postIndex = i;
