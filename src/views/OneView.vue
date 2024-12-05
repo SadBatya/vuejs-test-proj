@@ -3,6 +3,18 @@
     <v-btn color="primary" dark @click.stop="drawer_2 = !drawer_2"
       >Добавить пост</v-btn
     >
+    <v-navigation-drawer v-model="drawer" temporary absolute width="500px">
+      <div class="post__description">
+        <strong>{{ post_description.title }}</strong>
+        <div class="post__description_text">{{ post_description.body }}</div>
+        <v-btn
+          color="red"
+          class="nav__delete_btn"
+          @click="deletePost(post_description.title)"
+          >Удалить пост</v-btn
+        >
+      </div>
+    </v-navigation-drawer>
     <v-navigation-drawer v-model="drawer_2" temporary absolute width="500px">
       <div class="navigation__inputs">
         <v-text-field
@@ -14,12 +26,6 @@
           v-model="post_title"
           hide-details="auto"
           label="User Text"
-        ></v-text-field>
-        <v-text-field
-          type="number"
-          v-model="post_id"
-          hide-details="auto"
-          label="User Id"
         ></v-text-field>
         <v-btn @click="pushPost" class="navigation__btn" color="primary" dark
           >Отправить пост</v-btn
@@ -46,18 +52,15 @@
             <td class="table__col">{{ post.id }}</td>
             <td class="table__col">{{ post.title }}</td>
             <td class="table__col">{{ post.body }}</td>
+            <th>
+              <v-btn class="table__edit_btn" @click="editTextPost(post.id)"
+                >Редактировать</v-btn
+              >
+            </th>
           </tr>
         </tbody>
       </template>
     </v-simple-table>
-    <v-navigation-drawer v-model="drawer" temporary absolute width="500px">
-      <div class="post__description">
-        <strong>{{ post_description.title }}</strong>
-        <div class="post__description_text">{{ post_description.body }}</div>
-        <v-btn color="red" class="nav__delete_btn" @click="deletePost(post_description.title)">Удалить пост</v-btn>
-      </div>
-    </v-navigation-drawer>
-    <!-- {{ count }} -->
     <div class="table__buttons">
       <v-btn color="primary" dark @click.stop="drawer = !drawer">
         prev page
@@ -66,7 +69,6 @@
         next page
       </v-btn>
     </div>
-    <!-- <PostDescription /> -->
   </div>
 </template>
 
@@ -91,7 +93,7 @@
   }
 }
 
-.post__description{
+.post__description {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -99,7 +101,7 @@
   height: 100%;
 }
 
-.post__description_text{
+.post__description_text {
   margin-top: 50px;
 }
 
@@ -112,6 +114,7 @@
 
 .nav__delete_btn {
   margin-top: 50px;
+  z-index: 10;
 }
 </style>
 
@@ -170,9 +173,18 @@ export default {
         console.log("ошибка запроса описания поста", console.log(error));
       }
     },
+    async setNewTextPost() {
+      try {
+        await axios.patch(`https://dummyjson.com/posts/1`, {
+          body: "Новый текст",
+        });
+      } catch (e) {
+        console.log("Не удалось изменить пост", e);
+      }
+    },
     pushPost() {
       this.info.push({
-        id: this.post_id,
+        id: crypto.randomUUID(),
         title: this.post_title,
         body: this.post_body,
       });
@@ -183,13 +195,26 @@ export default {
     },
     deletePost(text) {
       let filteredList = this.info.filter((post) => post.title !== text);
-      this.info = filteredList
-      console.log(text)
-      console.log('пост удален')
+      this.info = filteredList;
+      console.log(text);
+      alert("пост удален");
     },
     openNavDrawer(i) {
       this.postIndex = i;
       console.log(this.postIndex);
+    },
+    editTextPost(id) {
+      const findedPost = this.info.find((post) => post.id === id);
+      const userNewText = prompt("Введите новый текст для поста");
+
+      if (!userNewText.length) {
+        alert("Поле не должно быть пустым");
+        return;
+      }
+
+      this.setNewTextPost(id);
+
+      findedPost.body = userNewText;
     },
   },
   beforeMount() {
