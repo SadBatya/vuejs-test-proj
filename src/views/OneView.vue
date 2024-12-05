@@ -41,6 +41,7 @@
             v-for="(post, i) in info"
             :key="i"
             @click.stop="drawer = !drawer"
+            @click="openNavDrawer(post.id)"
           >
             <td class="table__col">{{ post.id }}</td>
             <td class="table__col">{{ post.title }}</td>
@@ -50,8 +51,13 @@
       </template>
     </v-simple-table>
     <v-navigation-drawer v-model="drawer" temporary absolute width="500px">
-      <v-btn color="red" class="nav__delete_btn">Удалить пост</v-btn>
+      <div class="post__description">
+        <strong>{{ post_description.title }}</strong>
+        <div class="post__description_text">{{ post_description.body }}</div>
+        <v-btn color="red" class="nav__delete_btn" >Удалить пост</v-btn>
+      </div>
     </v-navigation-drawer>
+    <!-- {{ count }} -->
     <div class="table__buttons">
       <v-btn color="primary" dark @click.stop="drawer = !drawer">
         prev page
@@ -85,6 +91,18 @@
   }
 }
 
+.post__description{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.post__description_text{
+  margin-top: 50px;
+}
+
 .table__buttons {
   display: flex;
   gap: 20px;
@@ -114,13 +132,21 @@ export default {
   },
   data() {
     return {
+      postIndex: 0,
       info: null,
       drawer: null,
       drawer_2: null,
       post_id: "",
       post_title: "",
       post_body: "",
+      post_description: "",
     };
+  },
+  watch: {
+    postIndex(newPostIndex, oldPostIndex) {
+      console.log("новый индекс", newPostIndex, "старый индекс", oldPostIndex);
+      this.getDescriptionPost();
+    },
   },
   methods: {
     async getPosts() {
@@ -128,10 +154,20 @@ export default {
         const { data } = await axios.get(
           "https://dummyjson.com/posts?limit=10"
         );
-        console.log(data);
         this.info = data.posts;
       } catch (error) {
         console.log("Ошибка запроса", error);
+      }
+    },
+    async getDescriptionPost() {
+      try {
+        const { data } = await axios.get(
+          `https://dummyjson.com/posts/${this.postIndex}`
+        );
+        this.post_description = data;
+        console.log(data);
+      } catch (error) {
+        console.log("ошибка запроса описания поста", console.log(error));
       }
     },
     pushPost() {
@@ -148,12 +184,13 @@ export default {
     deletePost(i) {
       this.info.filter((post) => post !== post[i]);
     },
-    // openNavDrawer(id) {},
+    openNavDrawer(i) {
+      this.postIndex = i;
+      console.log(this.postIndex);
+    },
   },
   beforeMount() {
     this.getPosts();
   },
 };
 </script>
-
-<style></style>
