@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <form class="form__upload" >
     <input type="file" @change="sendFile($event.target.file)" />
     <v-btn color="primary" type="submit" dark>Отправить файл</v-btn>
@@ -22,7 +22,7 @@ export default {
     },
   },
 };
-</script>
+</script> -->
 
 <style>
 .form__upload {
