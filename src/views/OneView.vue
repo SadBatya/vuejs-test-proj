@@ -155,7 +155,7 @@ export default {
     async getPosts() {
       try {
         const { data } = await axios.get(
-          "https://dummyjson.com/posts?limit=10"
+          "https://dummyjson.com/posts?limit=5"
         );
         this.info = data.posts;
       } catch (error) {
